@@ -47,6 +47,33 @@ copy .env.example .env
 # Editar .env con tus configuraciones
 ```
 
+## 🐳 Instalación con Docker
+
+**Opción alternativa**: Usa Docker para un setup más rápido y portable.
+
+1. **Asegúrate de tener Docker instalado**:
+   - [Descargar Docker Desktop](https://www.docker.com/products/docker-desktop)
+
+2. **Configurar variables de entorno**:
+```bash
+copy .env.example .env
+# Editar .env con tus configuraciones
+```
+
+3. **Construir y ejecutar con Docker Compose**:
+```bash
+# Construir la imagen
+docker-compose build
+
+# Ejecutar todos los tests
+docker-compose run --rm chatbot-tests
+
+# Ejecutar smoke tests
+docker-compose run --rm chatbot-tests pytest -v -m smoke
+```
+
+📖 **Ver [Documentation/DOCKER.md](Documentation/DOCKER.md) para guía completa de Docker**
+
 ## 🎮 Uso
 
 ### Ejecutar todos los tests
@@ -89,6 +116,24 @@ $env:QUALITY_THRESHOLD="0.90"; pytest -v
 # Linux/Mac
 QUALITY_THRESHOLD=0.90 pytest -v
 ```
+
+### Con Docker
+
+```bash
+# Ejecutar todos los tests
+docker-compose run --rm chatbot-tests pytest -v
+
+# Smoke tests
+docker-compose run --rm chatbot-tests pytest -v -m smoke
+
+# Con reporte HTML
+docker-compose run --rm chatbot-tests pytest --html=reports/report.html --self-contained-html
+
+# Con threshold personalizado
+docker-compose run --rm -e QUALITY_THRESHOLD=0.90 chatbot-tests pytest -v
+```
+
+📖 **Más comandos Docker en [Documentation/DOCKER.md](Documentation/DOCKER.md)**
 
 ## 📊 Sistema de Scoring
 
@@ -135,8 +180,13 @@ chatbot-api-testing/
 │   └── test_scenarios.py           # Tests parametrizados
 ├── data/
 │   └── test_questions.json         # Dataset de preguntas
+├── Documentation/
+│   └── DOCKER.md                   # Guía de Docker
 ├── .github/workflows/
 │   └── api-tests.yml               # CI/CD con GitHub Actions
+├── Dockerfile                      # Configuración Docker
+├── docker-compose.yml              # Orquestación de contenedores
+├── .dockerignore                   # Exclusiones para Docker
 └── reports/                        # Reportes generados
 ```
 
@@ -204,9 +254,13 @@ El proyecto incluye GitHub Actions que:
 
 - ✅ Ejecuta tests automáticamente en push/PR
 - ✅ Corre tests diariamente (9 AM UTC)
+- ✅ **Tests con Python tradicional** (matriz 3.9-3.12) con `PYTHONPATH` configurado
+- ✅ **Tests con Docker** para consistencia con desarrollo local
 - ✅ Genera reportes HTML y coverage
 - ✅ Publica artifacts
 - ✅ Comenta resultados en PRs
+
+**Configuración de PYTHONPATH**: Todos los jobs de test incluyen `PYTHONPATH: ${{ github.workspace }}` para asegurar que Python encuentre el módulo `src`.
 
 ## 🤝 Contribuir
 

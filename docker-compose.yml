@@ -1,0 +1,36 @@
+services:
+  chatbot-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: chatbot-api-tests:latest
+    container_name: chatbot-api-tests
+
+    # Environment variables from .env file
+    env_file:
+      - .env
+
+    # Override environment variables if needed
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
+
+    # Mount volumes for persistence
+    volumes:
+      # Persist test reports
+      - ./reports:/app/reports
+      # Persist API responses
+      - ./responses:/app/responses
+      # Persist data directory
+      - ./data:/app/data
+
+    # Default command (can be overridden)
+    command: pytest -v
+
+    # Network configuration
+    networks:
+      - chatbot-network
+
+networks:
+  chatbot-network:
+    driver: bridge

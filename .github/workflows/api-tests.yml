@@ -76,17 +76,23 @@ jobs:
       run: |
         pytest -v -m smoke --html=reports/smoke-report-py${{ matrix.python-version }}.html --self-contained-html
       continue-on-error: false
+      env:
+        PYTHONPATH: ${{ github.workspace }}
     
     - name: Run quality tests
       run: |
         pytest -v -m quality --html=reports/quality-report-py${{ matrix.python-version }}.html --self-contained-html
       continue-on-error: true
       timeout-minutes: 10
+      env:
+        PYTHONPATH: ${{ github.workspace }}
     
     - name: Run all tests with coverage
       run: |
         pytest -v --cov=src --cov-report=html --cov-report=term --cov-report=xml --html=reports/full-report-py${{ matrix.python-version }}.html --self-contained-html
       timeout-minutes: 15
+      env:
+        PYTHONPATH: ${{ github.workspace }}
     
     - name: Upload test reports
       uses: actions/upload-artifact@v4
@@ -113,10 +119,59 @@ jobs:
         name: codecov-umbrella
       continue-on-error: true
 
+  test-docker:
+    name: Run Tests with Docker
+    runs-on: ubuntu-latest
+    needs: code-quality
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Create .env file
+      run: |
+        cp .env.example .env
+    
+    - name: Build Docker image
+      run: |
+        docker-compose build
+    
+    - name: Run smoke tests in Docker
+      run: |
+        docker-compose run --rm chatbot-tests pytest -v -m smoke
+      continue-on-error: false
+    
+    - name: Run quality tests in Docker
+      run: |
+        docker-compose run --rm chatbot-tests pytest -v -m quality
+      continue-on-error: true
+      timeout-minutes: 10
+    
+    - name: Run all tests with coverage in Docker
+      run: |
+        docker-compose run --rm chatbot-tests pytest -v --cov=src --cov-report=html --cov-report=term --cov-report=xml --html=reports/docker-report.html --self-contained-html
+      timeout-minutes: 15
+    
+    - name: Upload Docker test reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: docker-test-reports
+        path: reports/
+        retention-days: 30
+    
+    - name: Upload Docker coverage reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: docker-coverage-report
+        path: htmlcov/
+        retention-days: 30
+
   quality-gate:
     name: Quality Gate
     runs-on: ubuntu-latest
-    needs: test
+    needs: [test, test-docker]
     
     steps:
     - name: Checkout code
@@ -137,6 +192,7 @@ jobs:
       run: |
         python test_quality.py
       env:
+        PYTHONPATH: ${{ github.workspace }}
         QUALITY_THRESHOLD: 0.85
     
     - name: Check quality threshold
