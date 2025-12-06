@@ -2,8 +2,8 @@
 Script to view saved responses.
 """
 
-import sys
 import json
+import sys
 from pathlib import Path
 
 sys.path.insert(0, ".")

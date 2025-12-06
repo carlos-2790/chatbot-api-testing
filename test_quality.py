@@ -7,8 +7,8 @@ import sys
 sys.path.insert(0, ".")
 
 from src.api.chatbot_client import ChatbotClient
-from src.validators.quality_scorer import QualityScorer
 from src.utils.response_logger import ResponseLogger
+from src.validators.quality_scorer import QualityScorer
 
 
 def print_header(text, emoji="🎯"):

@@ -3,9 +3,9 @@ Setup script for chatbot API testing framework.
 Handles OneDrive path issues and provides clear feedback.
 """
 
+import os
 import subprocess
 import sys
-import os
 from pathlib import Path
 
 
