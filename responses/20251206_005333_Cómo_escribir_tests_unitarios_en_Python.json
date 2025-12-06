@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-12-06T00:53:33.548269",
+  "question": "¿Cómo escribir tests unitarios en Python?",
+  "response": {
+    "answer": "Para escribir tests unitarios en Python, sigue estas mejores prácticas: 1) Utiliza el módulo integrado 'unittest' o frameworks de terceros como 'pytest' que ofrecen más características y facilidad de uso. 2) Estructura tus tests de forma clara: cada test debe enfocarse en un solo comportamiento o función. 3) Usa nombres descriptivos para las funciones de test, por ejemplo, 'test_suma_devuelve_suma_correcta'. 4) Configura y limpia los entornos de prueba utilizando los métodos 'setUp' y 'tearDown' para asegurar la independencia de los tests. 5) Usa aserciones para verificar los resultados esperados, como 'self.assertEqual(resultado, esperado)'. 6) Simula las dependencias externas utilizando 'unittest.mock' para aislar el código que estás probando. 7) Mantén los tests rápidos e independientes; evita depender de sistemas externos o estado compartido. 8) Ejecuta los tests automáticamente utilizando herramientas de integración continua. Un ejemplo utilizando unittest es el siguiente: import unittest\nfrom mi_modulo import sumar\nclass TestSuma(unittest.TestCase):\n    def test_suma_numeros_positivos(self):\n        self.assertEqual(sumar(2, 3), 5)\n    def test_suma_numeros_negativos(self):\n        self.assertEqual(sumar(-1, -1), -2)\nif __name__ == '__main__':\n    unittest.main()",
+    "status_code": 200,
+    "response_time": 17.49888300895691
+  },
+  "quality_scores": {
+    "overall_score": 0.9025138139724733,
+    "structural_score": 1.0,
+    "content_score": 1.0,
+    "semantic_score": 0.7562845349311829,
+    "passes_threshold": true,
+    "threshold": 0.85,
+    "content_details": {
+      "has_code_examples": true,
+      "keyword_count": 7,
+      "frameworks_mentioned": [
+        "unittest",
+        "pytest"
+      ],
+      "has_structure": true,
+      "length": 1289,
+      "content_score": 1.0
+    },
+    "weights": {
+      "structural": 0.2,
+      "content": 0.4,
+      "semantic": 0.4
+    }
+  }
+}

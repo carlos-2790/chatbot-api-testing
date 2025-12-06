@@ -1,0 +1,74 @@
+[
+    {
+        "question": "¿Cómo escribir tests unitarios en Python?",
+        "expected_topics": [
+            "unittest",
+            "pytest",
+            "assert",
+            "mock",
+            "test cases"
+        ]
+    },
+    {
+        "question": "¿Qué es mocking y cuándo usarlo?",
+        "expected_topics": [
+            "mock",
+            "unittest.mock",
+            "external dependencies",
+            "isolation"
+        ]
+    },
+    {
+        "question": "Mejores prácticas de testing automatizado",
+        "expected_topics": [
+            "best practices",
+            "automation",
+            "CI/CD",
+            "test independence"
+        ]
+    },
+    {
+        "question": "¿Cómo hacer integration testing?",
+        "expected_topics": [
+            "integration",
+            "testing",
+            "modules",
+            "components"
+        ]
+    },
+    {
+        "question": "¿Qué es TDD y cómo implementarlo?",
+        "expected_topics": [
+            "TDD",
+            "test-driven development",
+            "red-green-refactor"
+        ]
+    },
+    {
+        "question": "¿Cómo organizar una suite de tests?",
+        "expected_topics": [
+            "test suite",
+            "organization",
+            "structure",
+            "fixtures"
+        ]
+    },
+    {
+        "question": "¿Qué son los test fixtures?",
+        "expected_topics": [
+            "fixtures",
+            "setup",
+            "teardown",
+            "pytest"
+        ]
+    },
+    {
+        "question": "¿Cómo medir code coverage?",
+        "expected_topics": [
+            "coverage",
+            "pytest-cov",
+            "metrics",
+            "quality"
+        ]
+    }
+]

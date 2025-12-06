@@ -1,0 +1,78 @@
+name: API Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 9 AM UTC
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Create reports directory
+      run: mkdir -p reports
+    
+    - name: Run smoke tests
+      run: |
+        pytest -v -m smoke --html=reports/smoke-report.html --self-contained-html
+      continue-on-error: false
+    
+    - name: Run regression tests
+      run: |
+        pytest -v -m regression --html=reports/regression-report.html --self-contained-html
+      continue-on-error: true
+    
+    - name: Run quality tests
+      run: |
+        pytest -v -m quality --html=reports/quality-report.html --self-contained-html
+      continue-on-error: true
+    
+    - name: Run all tests with coverage
+      run: |
+        pytest -v --cov=src --cov-report=html --cov-report=term --html=reports/full-report.html --self-contained-html
+    
+    - name: Upload test reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-reports
+        path: reports/
+    
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: coverage-report
+        path: htmlcov/
+    
+    - name: Comment PR with results
+      uses: actions/github-script@v6
+      if: github.event_name == 'pull_request'
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '✅ API tests completed! Check the artifacts for detailed reports.'
+          })
