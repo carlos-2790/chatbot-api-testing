@@ -1,15 +1,17 @@
 """
 Pytest configuration and shared fixtures.
 """
-import pytest
+
 import logging
+
+import pytest
+
 from src.api.chatbot_client import ChatbotClient
 from src.validators.quality_scorer import QualityScorer
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 

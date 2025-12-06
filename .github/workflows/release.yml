@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r dev-requirements.txt
+    
+    - name: Run full test suite
+      run: |
+        pytest -v --cov=src --cov-report=html --cov-report=term
+    
+    - name: Build package (placeholder)
+      run: |
+        echo "📦 Package build would happen here"
+        echo "You can add setup.py or pyproject.toml for packaging"
+    
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          ## 🎉 New Release
+          
+          ### Features
+          - Multi-dimensional quality scoring (Structural 20%, Content 40%, Semantic 40%)
+          - Sentence Transformers for semantic validation
+          - Automatic response logging
+          - Colorful emoji output
+          - CI/CD with GitHub Actions
+          
+          ### Installation
+          ```bash
+          pip install -r requirements.txt
+          ```
+          
+          See [README.md](README.md) for full documentation.
+        draft: false
+        prerelease: false

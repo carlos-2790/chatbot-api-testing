@@ -1,0 +1,59 @@
+name: Nightly Quality Report
+
+on:
+  schedule:
+    # Run every night at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  quality-report:
+    name: Generate Quality Report
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Create responses directory
+      run: mkdir -p responses
+    
+    - name: Run quality tests and save responses
+      run: |
+        python test_quality.py
+      env:
+        QUALITY_THRESHOLD: 0.85
+    
+    - name: Upload responses
+      uses: actions/upload-artifact@v4
+      with:
+        name: nightly-responses-${{ github.run_number }}
+        path: responses/
+        retention-days: 90
+    
+    - name: Generate summary
+      run: |
+        python view_responses.py > nightly-summary.txt
+    
+    - name: Upload summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: nightly-summary-${{ github.run_number }}
+        path: nightly-summary.txt
+        retention-days: 90
+    
+    - name: Send notification (placeholder)
+      run: |
+        echo "📊 Nightly quality report generated"
+        echo "You can add Slack/Email notifications here"
