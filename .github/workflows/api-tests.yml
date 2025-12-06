@@ -72,27 +72,24 @@ jobs:
     - name: Create reports directory
       run: mkdir -p reports
     
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
+    
     - name: Run smoke tests
       run: |
         pytest -v -m smoke --html=reports/smoke-report-py${{ matrix.python-version }}.html --self-contained-html
       continue-on-error: false
-      env:
-        PYTHONPATH: ${{ github.workspace }}
     
     - name: Run quality tests
       run: |
         pytest -v -m quality --html=reports/quality-report-py${{ matrix.python-version }}.html --self-contained-html
       continue-on-error: true
       timeout-minutes: 10
-      env:
-        PYTHONPATH: ${{ github.workspace }}
     
     - name: Run all tests with coverage
       run: |
         pytest -v --cov=src --cov-report=html --cov-report=term --cov-report=xml --html=reports/full-report-py${{ matrix.python-version }}.html --self-contained-html
       timeout-minutes: 15
-      env:
-        PYTHONPATH: ${{ github.workspace }}
     
     - name: Upload test reports
       uses: actions/upload-artifact@v4
@@ -188,11 +185,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
+    
     - name: Run quality validation
       run: |
         python test_quality.py
       env:
-        PYTHONPATH: ${{ github.workspace }}
         QUALITY_THRESHOLD: 0.85
     
     - name: Check quality threshold
