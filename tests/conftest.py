@@ -1,5 +1,5 @@
 """
-Pytest configuration and shared fixtures.
+Configuración de Pytest y fixtures compartidos.
 """
 
 import logging
@@ -17,7 +17,7 @@ logging.basicConfig(
 
 @pytest.fixture(scope="session")
 def api_client():
-    """Provide a ChatbotClient instance for the entire test session."""
+    """Provee una instancia de ChatbotClient para toda la sesión de pruebas."""
     client = ChatbotClient()
     yield client
     client.close()
@@ -25,17 +25,17 @@ def api_client():
 
 @pytest.fixture(scope="session")
 def quality_scorer():
-    """Provide a QualityScorer instance for the entire test session."""
+    """Provee una instancia de QualityScorer para toda la sesión de pruebas."""
     return QualityScorer()
 
 
 @pytest.fixture
 def sample_question():
-    """Provide a sample question for testing."""
+    """Provee una pregunta de ejemplo para las pruebas."""
     return "¿Cómo escribir tests unitarios en Python?"
 
 
 @pytest.fixture
 def sample_response(api_client, sample_question):
-    """Provide a sample API response for testing."""
+    """Provee una respuesta de API de ejemplo para las pruebas."""
     return api_client.ask(sample_question)

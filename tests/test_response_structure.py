@@ -1,5 +1,5 @@
 """
-Response structure validation tests.
+Pruebas de validación de estructura de respuesta.
 """
 
 import pytest
@@ -9,41 +9,45 @@ from src.validators.response_validator import ResponseValidator
 
 @pytest.mark.regression
 class TestResponseStructure:
-    """Test response structure and schema validation."""
+    """Prueba la estructura de la respuesta y la validación del esquema."""
 
     def test_response_has_data_field(self, sample_response):
-        """Test that response contains 'data' field."""
-        assert "data" in sample_response, "Response missing 'data' field"
+        """Prueba que la respuesta contenga el campo 'data'."""
+        assert "data" in sample_response, "La respuesta no tiene el campo 'data'"
 
     def test_response_has_answer_field(self, sample_response):
-        """Test that response data contains 'answer' field."""
-        assert "answer" in sample_response["data"], "Response data missing 'answer' field"
+        """Prueba que los datos de respuesta contengan el campo 'answer'."""
+        assert (
+            "answer" in sample_response["data"]
+        ), "Los datos de respuesta no tienen el campo 'answer'"
 
     def test_answer_is_string(self, sample_response):
-        """Test that answer field is a string."""
+        """Prueba que el campo 'answer' sea una cadena de texto."""
         answer = sample_response["data"]["answer"]
-        assert isinstance(answer, str), f"Answer must be string, got {type(answer).__name__}"
+        assert isinstance(
+            answer, str
+        ), f"La respuesta debe ser texto, se obtuvo {type(answer).__name__}"
 
     def test_answer_not_empty(self, sample_response):
-        """Test that answer is not empty."""
+        """Prueba que la respuesta no esté vacía."""
         answer = sample_response["data"]["answer"]
-        assert len(answer.strip()) > 0, "Answer is empty"
+        assert len(answer.strip()) > 0, "La respuesta está vacía"
 
     def test_response_has_metadata(self, sample_response):
-        """Test that response includes metadata fields."""
-        assert "status_code" in sample_response, "Response missing 'status_code'"
-        assert "response_time" in sample_response, "Response missing 'response_time'"
-        assert "question" in sample_response, "Response missing 'question'"
+        """Prueba que la respuesta incluya campos de metadatos."""
+        assert "status_code" in sample_response, "La respuesta no tiene 'status_code'"
+        assert "response_time" in sample_response, "La respuesta no tiene 'response_time'"
+        assert "question" in sample_response, "La respuesta no tiene 'question'"
 
     def test_response_validation_passes(self, sample_response):
-        """Test that response passes complete validation."""
+        """Prueba que la respuesta pase la validación completa."""
         is_valid, errors = ResponseValidator.validate_response(sample_response)
-        assert is_valid, f"Response validation failed: {', '.join(errors)}"
+        assert is_valid, f"Falló la validación de respuesta: {', '.join(errors)}"
 
     def test_answer_minimum_length(self, sample_response):
-        """Test that answer meets minimum length requirement."""
+        """Prueba que la respuesta cumpla con la longitud mínima."""
         answer = sample_response["data"]["answer"]
         min_length = 100
         assert (
             len(answer) >= min_length
-        ), f"Answer length {len(answer)} is below minimum {min_length}"
+        ), f"La longitud de la respuesta {len(answer)} está por debajo del mínimo {min_length}"
