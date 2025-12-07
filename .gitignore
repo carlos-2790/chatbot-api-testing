@@ -67,3 +67,5 @@ sentence_transformers/
 
 # Logs
 *.log
+
+/Documentation/
