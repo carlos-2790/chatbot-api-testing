@@ -21,7 +21,7 @@ class TestAPIHealth:
         assert response["status_code"] == 200, f"Expected 200, got {response['status_code']}"
 
     def test_response_time_acceptable(self, api_client):
-        """Test that API responds within acceptable time (<5 seconds)."""
+        """Test that API responds within acceptable time (<20 seconds)."""
         response = api_client.ask("test")
         assert (
             response["response_time"] < 20.0
