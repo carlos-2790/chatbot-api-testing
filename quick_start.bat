@@ -41,6 +41,7 @@ echo ✓ Dependencies installed
 
 echo.
 echo [4/4] Running smoke tests...
+set PYTHONPATH=.
 pytest -v -m smoke
 if errorlevel 1 (
     echo.
