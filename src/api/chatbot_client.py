@@ -75,11 +75,18 @@ class ChatbotClient:
             # Raise exception for bad status codes
             response.raise_for_status()
 
+            # Check for empty response
+            if not response.content or not response.text.strip():
+                raise ValueError("Empty response received from API")
+
             # Calculate response time
             response_time = time.time() - start_time
 
             # Parse JSON response
-            data = response.json()
+            try:
+                data = response.json()
+            except ValueError as e:
+                raise ValueError(f"Invalid JSON response: {response.text[:200]}...") from e
 
             # Add metadata
             result = {
