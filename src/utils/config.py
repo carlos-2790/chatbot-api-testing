@@ -24,7 +24,7 @@ class Config:
     QUALITY_THRESHOLD = float(os.getenv("QUALITY_THRESHOLD", "0.85"))
 
     # Timeout settings
-    API_TIMEOUT = int(os.getenv("API_TIMEOUT", "10"))
+    API_TIMEOUT = int(os.getenv("API_TIMEOUT", "30"))
     REQUEST_RETRY_COUNT = int(os.getenv("REQUEST_RETRY_COUNT", "3"))
 
     # Logging

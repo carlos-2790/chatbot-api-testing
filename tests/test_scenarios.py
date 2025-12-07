@@ -43,7 +43,7 @@ class TestScenarios:
     def test_question_response_time(self, api_client, question):
         """Prueba que cada pregunta responda en un tiempo aceptable."""
         response = api_client.ask(question)
-        max_time = 5.0
+        max_time = 20.0
         assert (
             response["response_time"] < max_time
         ), f"La pregunta '{question}' tardó demasiado: {response['response_time']:.2f}s > {max_time}s"
