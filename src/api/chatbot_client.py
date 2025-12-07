@@ -1,6 +1,6 @@
 """
-HTTP client for interacting with the chatbot API.
-Includes retry logic, timeout handling, and performance metrics.
+Cliente HTTP para interactuar con la API del chatbot.
+Incluye lógica de reintento, manejo de tiempos de espera y métricas de rendimiento.
 """
 
 import logging
@@ -17,25 +17,25 @@ logger = logging.getLogger(__name__)
 
 
 class ChatbotClient:
-    """Client for making requests to the chatbot API."""
+    """Cliente para realizar peticiones a la API del chatbot."""
 
     def __init__(self, base_url: Optional[str] = None, timeout: Optional[int] = None):
         """
-        Initialize the chatbot client.
+        Inicializa el cliente del chatbot.
 
         Args:
-            base_url: Base URL for the API (defaults to Config.API_URL)
-            timeout: Request timeout in seconds (defaults to Config.API_TIMEOUT)
+            base_url: URL base para la API (por defecto usa Config.API_URL)
+            timeout: Tiempo de espera de la petición en segundos (por defecto usa Config.API_TIMEOUT)
         """
         self.base_url = base_url or Config.API_URL
         self.timeout = timeout or Config.API_TIMEOUT
         self.session = self._create_session()
 
     def _create_session(self) -> requests.Session:
-        """Create a requests session with retry logic."""
+        """Crea una sesión de requests con lógica de reintento."""
         session = requests.Session()
 
-        # Configure retry strategy
+        # Configurar estrategia de reintento
         retry_strategy = Retry(
             total=Config.REQUEST_RETRY_COUNT,
             backoff_factor=1,
@@ -51,44 +51,44 @@ class ChatbotClient:
 
     def ask(self, question: str) -> Dict:
         """
-        Send a question to the chatbot API.
+        Envía una pregunta a la API del chatbot.
 
         Args:
-            question: The question to ask
+            question: La pregunta a realizar
 
         Returns:
-            Dict containing the API response with additional metadata
+            Dict conteniendo la respuesta de la API con metadatos adicionales
 
         Raises:
-            requests.RequestException: If the request fails
+            requests.RequestException: Si la petición falla
         """
         start_time = time.time()
 
         try:
-            logger.info(f"Sending question to API: {question[:50]}...")
+            logger.info(f"Enviando pregunta a la API: {question[:50]}...")
 
-            # Make the request
+            # Realizar la petición
             response = self.session.get(
                 self.base_url, params={"input": question}, timeout=self.timeout
             )
 
-            # Raise exception for bad status codes
+            # Lanzar excepción para códigos de estado erróneos
             response.raise_for_status()
 
-            # Check for empty response
+            # Verificar respuesta vacía
             if not response.content or not response.text.strip():
-                raise ValueError("Empty response received from API")
+                raise ValueError("Respuesta vacía recibida de la API")
 
-            # Calculate response time
+            # Calcular tiempo de respuesta
             response_time = time.time() - start_time
 
-            # Parse JSON response
+            # Analizar respuesta JSON
             try:
                 data = response.json()
             except ValueError as e:
-                raise ValueError(f"Invalid JSON response: {response.text[:200]}...") from e
+                raise ValueError(f"Respuesta JSON inválida: {response.text[:200]}...") from e
 
-            # Add metadata
+            # Añadir metadatos
             result = {
                 "data": data,
                 "response_time": response_time,
@@ -96,41 +96,41 @@ class ChatbotClient:
                 "question": question,
             }
 
-            logger.info(f"Received response in {response_time:.2f}s")
+            logger.info(f"Respuesta recibida en {response_time:.2f}s")
             return result
 
         except requests.exceptions.Timeout:
-            logger.error(f"Request timed out after {self.timeout}s")
+            logger.error(f"La petición expiró después de {self.timeout}s")
             raise
         except requests.exceptions.RequestException as e:
-            logger.error(f"Request failed: {str(e)}")
+            logger.error(f"La petición falló: {str(e)}")
             raise
         except ValueError as e:
-            logger.error(f"Failed to parse JSON response: {str(e)}")
+            logger.error(f"Fallo al analizar la respuesta JSON: {str(e)}")
             raise
 
     def health_check(self) -> bool:
         """
-        Check if the API is available.
+        Verifica si la API está disponible.
 
         Returns:
-            True if API is healthy, False otherwise
+            True si la API está saludable, False en caso contrario
         """
         try:
             response = self.ask("test")
             return response["status_code"] == 200
         except Exception as e:
-            logger.error(f"Health check failed: {str(e)}")
+            logger.error(f"Verificación de salud falló: {str(e)}")
             return False
 
     def close(self):
-        """Close the session."""
+        """Cierra la sesión."""
         self.session.close()
 
     def __enter__(self):
-        """Context manager entry."""
+        """Entrada del administrador de contexto."""
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """Context manager exit."""
+        """Salida del administrador de contexto."""
         self.close()
