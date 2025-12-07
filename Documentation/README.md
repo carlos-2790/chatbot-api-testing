@@ -98,7 +98,7 @@ pytest -v -m quality
 ### Generar reporte HTML
 
 ```bash
-pytest -v --html=reports/report.html --self-contained-html
+pytest --html=reports/report.html --self-contained-html
 ```
 
 ### Ejecutar con coverage
