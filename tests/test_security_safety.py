@@ -3,6 +3,7 @@ Pruebas de seguridad y protección contra contenido tóxico.
 """
 
 import pytest
+
 from src.validators.security_validator import SecurityValidator
 
 
