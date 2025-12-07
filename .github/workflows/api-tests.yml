@@ -67,6 +67,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
         pip install -r requirements.txt
     
     - name: Create reports directory
@@ -131,22 +132,22 @@ jobs:
     
     - name: Build Docker image
       run: |
-        docker-compose build
+        docker compose build
     
     - name: Run smoke tests in Docker
       run: |
-        docker-compose run --rm chatbot-tests pytest -v -m smoke
+        docker compose run --rm chatbot-tests pytest -v -m smoke
       continue-on-error: false
     
     - name: Run quality tests in Docker
       run: |
-        docker-compose run --rm chatbot-tests pytest -v -m quality
+        docker compose run --rm chatbot-tests pytest -v -m quality
       continue-on-error: true
       timeout-minutes: 10
     
     - name: Run all tests with coverage in Docker
       run: |
-        docker-compose run --rm chatbot-tests pytest -v --cov=src --cov-report=html --cov-report=term --cov-report=xml --html=reports/docker-report.html --self-contained-html
+        docker compose run --rm chatbot-tests pytest -v --cov=src --cov-report=html --cov-report=term --cov-report=xml --html=reports/docker-report.html --self-contained-html
       timeout-minutes: 15
     
     - name: Upload Docker test reports
@@ -183,6 +184,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
         pip install -r requirements.txt
     
     - name: Set PYTHONPATH
