@@ -5,7 +5,7 @@ Incluye lógica de reintento, manejo de tiempos de espera y métricas de rendimi
 
 import logging
 import time
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -49,43 +49,72 @@ class ChatbotClient:
 
         return session
 
-    def ask(self, question: str) -> Dict:
+    def ask(self, question: str, debug: bool = False) -> Dict[str, Any]:
         """
         Envía una pregunta a la API del chatbot.
 
         Args:
             question: La pregunta a realizar
+            debug: Si True, retorna información detallada de la respuesta
 
         Returns:
             Dict conteniendo la respuesta de la API con metadatos adicionales
 
         Raises:
             requests.RequestException: Si la petición falla
+            ValueError: Si la respuesta es inválida o vacía
         """
         start_time = time.time()
 
         try:
+            if not question or not question.strip():
+                raise ValueError("La pregunta no puede estar vacía")
+            
             logger.info(f"Enviando pregunta a la API: {question[:50]}...")
 
             # Realizar la petición POST enviando JSON
             payload = {"question": question}
-            response = self.session.post(self.base_url, json=payload, timeout=self.timeout)
+            response = self.session.post(
+                self.base_url, 
+                json=payload, 
+                timeout=self.timeout,
+                headers={"Content-Type": "application/json"}
+            )
+
+            # Calcular tiempo de respuesta
+            response_time = time.time() - start_time
+            
+            if debug:
+                logger.info(f"DEBUG - Status Code: {response.status_code}")
+                logger.info(f"DEBUG - Headers: {dict(response.headers)}")
+                logger.info(f"DEBUG - Content Length: {len(response.content)}")
+                logger.info(f"DEBUG - Response Time: {response_time:.2f}s")
 
             # Lanzar excepción para códigos de estado erróneos
             response.raise_for_status()
 
             # Verificar respuesta vacía
             if not response.content or not response.text.strip():
-                raise ValueError("Respuesta vacía recibida de la API")
-
-            # Calcular tiempo de respuesta
-            response_time = time.time() - start_time
+                error_msg = (
+                    "Respuesta vacía recibida de la API. "
+                    "Verifique que:\n"
+                    "1. El Magic Loop está ejecutándose correctamente\n"
+                    "2. El LLM block está configurado para retornar respuesta\n"
+                    "3. La API Response block está correctamente mapeada"
+                )
+                logger.warning(error_msg)
+                raise ValueError(error_msg)
 
             # Analizar respuesta JSON
             try:
                 data = response.json()
             except ValueError as e:
-                raise ValueError(f"Respuesta JSON inválida: {response.text[:200]}...") from e
+                logger.error(f"Respuesta no es JSON válido: {response.text[:500]}")
+                raise ValueError(f"Respuesta JSON inválida: {response.text[:200]}") from e
+
+            # Validar estructura
+            if not isinstance(data, dict):
+                raise ValueError(f"Se esperaba un objeto JSON, se recibió: {type(data).__name__}")
 
             # Añadir metadatos
             result = {
@@ -96,6 +125,8 @@ class ChatbotClient:
             }
 
             logger.info(f"Respuesta recibida en {response_time:.2f}s")
+            if debug:
+                logger.info(f"DEBUG - Response Data: {data}")
             return result
 
         except requests.exceptions.Timeout:
@@ -105,7 +136,7 @@ class ChatbotClient:
             logger.error(f"La petición falló: {str(e)}")
             raise
         except ValueError as e:
-            logger.error(f"Fallo al analizar la respuesta JSON: {str(e)}")
+            logger.error(f"Error validando respuesta: {str(e)}")
             raise
 
     def health_check(self) -> bool:
@@ -119,11 +150,13 @@ class ChatbotClient:
             response = self.ask("test")
             return response["status_code"] == 200
         except Exception as e:
-            logger.error(f"Verificación de salud falló: {str(e)}")
+            logger.error(f"Health check falló: {e}")
             return False
 
     def close(self):
-        """Cierra la sesión."""
+        """
+        Cierra la sesión HTTP del cliente.
+        """
         self.session.close()
 
     def __enter__(self):
