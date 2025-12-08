@@ -16,7 +16,9 @@ class Config:
     """Central configuration class for the testing framework."""
 
     # API Configuration
-    API_URL = os.getenv("API_URL", "https://magicloops.dev/api/loop/8f561a04-e7e4-46f0-9c10-e2b23554a41e/run")
+    API_URL = os.getenv(
+        "API_URL", "https://magicloops.dev/api/loop/8f561a04-e7e4-46f0-9c10-e2b23554a41e/run"
+    )
 
     # Quality Threshold
     QUALITY_THRESHOLD = float(os.getenv("QUALITY_THRESHOLD", "0.85"))

@@ -33,7 +33,7 @@ def api_client():
     else:
         client = ChatbotClient()
         logger.info("Cliente inicializado con API real")
-    
+
     yield client
     client.close()
 

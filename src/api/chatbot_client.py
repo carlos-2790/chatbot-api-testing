@@ -5,7 +5,7 @@ Incluye lógica de reintento, manejo de tiempos de espera y métricas de rendimi
 
 import logging
 import time
-from typing import Dict, Optional, Any
+from typing import Any, Dict, Optional
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -69,21 +69,21 @@ class ChatbotClient:
         try:
             if not question or not question.strip():
                 raise ValueError("La pregunta no puede estar vacía")
-            
+
             logger.info(f"Enviando pregunta a la API: {question[:50]}...")
 
             # Realizar la petición POST enviando JSON
             payload = {"question": question}
             response = self.session.post(
-                self.base_url, 
-                json=payload, 
+                self.base_url,
+                json=payload,
                 timeout=self.timeout,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json"},
             )
 
             # Calcular tiempo de respuesta
             response_time = time.time() - start_time
-            
+
             if debug:
                 logger.info(f"DEBUG - Status Code: {response.status_code}")
                 logger.info(f"DEBUG - Headers: {dict(response.headers)}")
