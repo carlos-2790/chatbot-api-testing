@@ -67,10 +67,9 @@ class ChatbotClient:
         try:
             logger.info(f"Enviando pregunta a la API: {question[:50]}...")
 
-            # Realizar la petición
-            response = self.session.get(
-                self.base_url, params={"input": question}, timeout=self.timeout
-            )
+            # Realizar la petición POST enviando JSON
+            payload = {"question": question}
+            response = self.session.post(self.base_url, json=payload, timeout=self.timeout)
 
             # Lanzar excepción para códigos de estado erróneos
             response.raise_for_status()
